@@ -1,9 +1,15 @@
 let game;
+let restart;
 function setup() {
   // put setup code here
-  createCanvas(600, 600);
-  game = new Game();
-  game.start()
+  	createCanvas(800, 601);
+  	background(200);
+  	console.log(width);
+	game = new Game();
+    restart = createButton("Restart");
+    restart.position(675, 400);
+    restart.mousePressed(rebegin);
+	game.start();
 }
 
 function draw() {
@@ -16,4 +22,8 @@ function mouseClicked(){
 	console.log("X: " + mouseX);
 	//column 1
 	game.play(mouseX, mouseY);
+}
+
+function rebegin(){
+	game.start();
 }
