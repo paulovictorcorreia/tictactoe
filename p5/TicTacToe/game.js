@@ -145,6 +145,13 @@ class Game{
 			text("Jogador " + this.token + " Venceu!",675, 300);
 			return true;
 		}
+		else if((this.matrix[0][1] + this.matrix[1][1] + this.matrix[2][1]) == (this.token*3))
+		{
+			console.log("Jogador " + this.token + " Venceu!");
+			fill(0, 30, 40);
+			text("Jogador " + this.token + " Venceu!",675, 300);
+			return true;
+		}
 		this.token = this.token*(-1);
 		return false;
 	}
