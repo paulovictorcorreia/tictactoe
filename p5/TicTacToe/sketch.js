@@ -3,7 +3,7 @@ let restart;
 function setup() {
   // put setup code here
   	createCanvas(800, 601);
-  	background(200);
+  	background(240,230,140);
   	console.log(width);
 	game = new Game();
     restart = createButton("Restart");
@@ -21,7 +21,7 @@ function mouseClicked(){
 	console.log("Y: " + mouseY);
 	console.log("X: " + mouseX);
 	//column 1
-	game.play(mouseX, mouseY);
+	game.play();
 }
 
 function rebegin(){
