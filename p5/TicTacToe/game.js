@@ -4,7 +4,7 @@ class Game{
 		this.matrix = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];//Game table in which we store position
 		this.token = 0;//Players turn(1 and -1)
 		this.state = false;//State of the game: if it ended or not(true if the game has ended)
-		this.gameType = 0;//If the game is PvP or PvE
+		this.gameType = 0;//If the game is PvP or PvE or EvP
 		this.turn = 0;//Variable for the turn of the game(MAX value is 9)
 	}
 	start()//Game starting condition
@@ -23,51 +23,21 @@ class Game{
 	  	line(200, 0, 200, 600);
 	  	line(400, 0, 400, 600);
 	}
-	play()//depending on the gametype, it will wait for the other player movement or the AI to play
+	play(gamemode)//depending on the gametype, it will wait for the other player movement or the AI to play
 	{
-		if(mouseX <= 200 && mouseY <= 200 )
+		if(gamemode == 0)
 		{
-			this.validPlays(0, 0);
+			this.PlayerVSPlayer();
 		}
-		else if(mouseX <= 200 && mouseY <= 400)
+		else if(gamemode == 1)
 		{
-			this.validPlays(1, 0);
-		}
-		else if(mouseX <= 200 && mouseY <= 600)
-		{
-			this.validPlays(2, 0);
-		}
-		//Column 2
-		else if(mouseX <= 400 && mouseY <= 200)
-		{
-			this.validPlays(0, 1);
-		}
-		else if(mouseX <= 400 && mouseY <= 400)
-		{
-			this.validPlays(1, 1);
-		}
-		else if(mouseX <= 400 && mouseY <= 600)
-		{
-			this.validPlays(2, 1);
-		}
-		//column 3
-		else if(mouseX <= 600 && mouseY <= 200)
-		{
-			this.validPlays(0, 2);
-		}
-		else if(mouseX <= 600 && mouseY <= 400)
-		{
-			this.validPlays(1, 2);
-		}
-		else if(mouseX <= 600 && mouseY <= 600)
-		{
-			this.validPlays(2, 2);
+
 		}
 		console.log(this.matrix[0][0] + " " + this.matrix[0][1] + " " + this.matrix[0][2]);
 		console.log(this.matrix[1][0] + " " + this.matrix[1][1] + " " + this.matrix[1][2]);
 		console.log(this.matrix[2][0] + " " + this.matrix[2][1] + " " + this.matrix[2][2]);
 	}
-
+	
 	validPlays(_i, _j)
 	{
 		if(this.matrix[_i][_j] == 0 ){
@@ -163,6 +133,46 @@ class Game{
 			text("Tie!",675, 300);
 		}
 	}
-	
+	PlayerVSPlayer()
+	{
+		if(mouseX <= 200 && mouseY <= 200 )
+		{
+			this.validPlays(0, 0);
+		}
+		else if(mouseX <= 200 && mouseY <= 400)
+		{
+			this.validPlays(1, 0);
+		}
+		else if(mouseX <= 200 && mouseY <= 600)
+		{
+			this.validPlays(2, 0);
+		}
+		//Column 2
+		else if(mouseX <= 400 && mouseY <= 200)
+		{
+			this.validPlays(0, 1);
+		}
+		else if(mouseX <= 400 && mouseY <= 400)
+		{
+			this.validPlays(1, 1);
+		}
+		else if(mouseX <= 400 && mouseY <= 600)
+		{
+			this.validPlays(2, 1);
+		}
+		//column 3
+		else if(mouseX <= 600 && mouseY <= 200)
+		{
+			this.validPlays(0, 2);
+		}
+		else if(mouseX <= 600 && mouseY <= 400)
+		{
+			this.validPlays(1, 2);
+		}
+		else if(mouseX <= 600 && mouseY <= 600)
+		{
+			this.validPlays(2, 2);
+		}
+	}
 	
 };
