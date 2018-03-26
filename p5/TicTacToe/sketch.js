@@ -46,7 +46,7 @@ function mousePressed(){
 	console.log("X: " + mouseX);
 	if(pvp == true)
 	{
-		game.play(0);
+		game.play(1);
 	}
 	
 	//column 1
