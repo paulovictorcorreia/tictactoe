@@ -6,8 +6,6 @@ class Game{
         this.state = 0;//State of the game: if it ended or not(true if the game has ended)
         this.gameType = 0;//If the game is PvP or PvE or EvP
         this.turn = 0;//Variable for the turn of the game(MAX value is 9)
-        this.victoryToken = 0;
-        this.numNodes = 0;
         this.posX = 0;
         this.posY = 0;
     }
@@ -15,10 +13,8 @@ class Game{
     {
         this.token = 1;
         this.matrix = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
-        this.state = false;
+        this.state = 0;
         this.turn = 0;
-        this.victoryToken = 0;
-        this.numNodes = 0;
         clear();
         background(240,230,140);
         fill(240,230,140);
@@ -38,8 +34,25 @@ class Game{
         {
             this.PlayerVSAI();
         }
+        else if(gamemode == 2)
+        {
+        	this.AIvsPlayer()
+        }
+        else if(gamemode == 3)
+        {
+        	this.AIvsPlayer_Easy();
+        }
+        else if(gamemode == 4)
+        {
+        	this.PlayerVSAI_Easy();
+        }
     }
-    
+    /*
+	Checa se a posição dada pelo o humano é válida para se jogar, e se for, imprime na tela o novo tabuleiro e atualiza
+	as variáveis de estado, turno e token;
+		_i: posição vertical no tabuleiro
+		_j: posição horizontal no tabuleiro
+    */
     validPlays(_i, _j)
     {
         if(this.matrix[_i][_j] == 0 )
@@ -56,6 +69,10 @@ class Game{
         }
         this.checkGame(this.turn, this.state);
     }
+    /*
+    Método para imprimir as figuras no tabuleiro
+    	matrix: estado do jogo que se deseja imprimir na tela
+    */
     figure(matrix)
     {
         for(let i = 0; i < 3; i++)
@@ -75,8 +92,13 @@ class Game{
             }
         }
     }
+    /*
+	Método para checar em todas as combinações possíveis se o jogador ganhou o jogo
+		matrix: tabuleiro que se quer verificar se alguém ganhou
+		token: jogador que se quer saber se ganhou
+    */
     checkVictory(matrix, token)
-    {//Falta digitar as condições de vitória ainda, só fiz a primeira linha
+    {
         if((matrix[0][0] + matrix[0][1] + matrix[0][2]) == (token*3))
         {
             return token;
@@ -111,7 +133,7 @@ class Game{
         }
         return 0;
     }
-    displayVictory(state)
+    displayVictory(state)//Mostra na tela o jogador que ganho o jogo
     {
         fill(0, 30, 40);
         text("Jogador " + state + " Venceu!",675, 300);
@@ -130,6 +152,9 @@ class Game{
             return state;
         }
     }
+    /*
+    Método para jogar Player vs Player, o qual verifica onde foi clicado, se a posição é válida e se a jogada é válida.
+    */
     PlayerVSPlayer()
     {
 
@@ -172,31 +197,100 @@ class Game{
             this.validPlays(2, 2);
         }
     }
-    PlayerVSAI()
+    PlayerVSAI()//Método para chamar jogar Player vs IA no modo dificil
     {
-        if(this.token == 1)
+        if(this.token === 1)
         {
             this.PlayerVSPlayer();
         }
         else
         {
-            
             this.minmaxCall();
+            this.printMatrix(this.matrix);
             this.figure(this.matrix);
+            this.state = this.checkVictory(this.matrix, this.token);
+            if(this.state != 0)
+            {
+            	this.displayVictory(this.state);
+            }
             this.token = this.token*(-1);
             this.turn++;
         }
     }
+    PlayerVSAI_Easy()//Método para chamar jogar Player vs IA no modo fácil
+    {
+    	if(this.token === 1)
+        {
+            this.PlayerVSPlayer();
+        }
+        else
+        {
+            this.minmaxCall_Easy();
+            this.printMatrix(this.matrix);
+            this.figure(this.matrix);
+            this.state = this.checkVictory(this.matrix, this.token);
+            if(this.state != 0)
+            {
+            	this.displayVictory(this.state);
+            }
+            this.token = this.token*(-1);
+            this.turn++;
+        }
+    }
+    AIvsPlayer()//Método para chamar jogar AI vs Player no modo difícil
+    {
+    	if(this.token === -1)
+        {
+            this.PlayerVSPlayer();
+        }
+        else
+        {
+            this.minmaxCall();
+            this.printMatrix(this.matrix);
+            this.figure(this.matrix);
+            this.state = this.checkVictory(this.matrix, this.token);
+            if(this.state != 0)
+            {
+            	this.displayVictory(this.state);
+            }
+            this.token = this.token*(-1);
+            this.turn++;
+        }
+    }
+    AIvsPlayer_Easy()//Método para chamar jogar AI vs Player no modo fácil
+    {
+    	if(this.token === -1)
+        {
+            this.PlayerVSPlayer();
+        }
+        else
+        {
+            this.minmaxCall_Easy();
+            this.printMatrix(this.matrix);
+            this.figure(this.matrix);
+            this.state = this.checkVictory(this.matrix, this.token);
+            if(this.state != 0)
+            {
+            	this.displayVictory(this.state);
+            }
+            this.token = this.token*(-1);
+            this.turn++;
+        }
+    }
+    /*
+	verifica se há empate no jogo.
+		matrix: matrix que se quer verificar o empate
+		depth: profundidade da arvore de busca, que foi definida em 1 para o código todo
+    */
     checkTie(matrix, depth)
     {
-        if((this.turn + depth == 9) && (this.checkVictory(matrix, depth)==false) && (this.checkVictory(matrix, 1)==false))
+        if((this.checkVictory(matrix, -1)===0) && (this.checkVictory(matrix, 1)===0))
         {
             return true;
         }
-        else
         return false;
     }
-    minmaxCall()
+    minmaxCall()//Função que chama o minmax com as hard rules
     {
         var copyMatrix = [[0, 0, 0],[0 ,0 ,0], [0, 0, 0]];
         for(let i = 0; i < 3; i++)
@@ -209,76 +303,294 @@ class Game{
         this.minmax(copyMatrix, this.token, 0);
         this.matrix[this.posY][this.posX] = this.token;
     }
-    minmax(copyMatrix, player, depth)
+    minmaxCall_Easy()//Função que chama o minmax sem as hardrules
     {
-        if((this.checkVictory(copyMatrix,player) == true)||(this.checkTie(copyMatrix, depth) == true)) 
-        {
-            let chance = this.chanceOfWinning(copyMatrix, player);
-            return chance;
-        }
-        else if(player == -1)
-        {
-            let tempScore;
-            let moveI;
-            let moveJ;
-            let score = 10;
-            // console.log(copyMatrix);
-            for(let i = 0; i < 3; i++)
+    	var copyMatrix = [[0, 0, 0],[0 ,0 ,0], [0, 0, 0]];
+        for(let i = 0; i < 3; i++)
             {
                 for(let j = 0; j < 3; j++)
                 {
-                    if(copyMatrix[i][j] == '0')
-                    {
-                        copyMatrix[i][j] = player;
-                        tempScore = this.minmax(copyMatrix, player*(-1), depth+1);
-                        // console.log(tempScore);
-                        copyMatrix[i][j] = 0;
-                        copyMatrix[i][j] =  0;
-                        if(tempScore < score)
-                        {
-                            score = tempScore;
-                            moveI = i;
-                            moveJ = j;
-                        }
-                    }
-                
-                }       
+                    copyMatrix[i][j] = this.matrix[i][j];   
+                }   
             }
-            // console.log(score);
-            this.posX = moveJ;
-            this.posY = moveI;
-            return score;
+        this.minmax_Easy(copyMatrix, this.token, 0);
+        this.matrix[this.posY][this.posX] = this.token;	
+    }
+    /*
+    minmax:Calcula os custos da jogada posterior da IA e minimiza-os caso não entre em certas regras, caso entre nessas regras, a máquina joga onde foi especificado
+    	copyMatrix: uma cópia do tabuleiro na jogada atual do jogo
+    	player: token que define quem é o jogador, isto é, se é a IA ou o humano
+    	depth: profundidade da árvore de busca
+    */
+    minmax(copyMatrix, player, depth)
+    {
+        if(depth===1)
+        {
+            let chance = this.chanceOfWinning(copyMatrix, player);
+            return chance;
         }
         else if(player == 1)
         {
             let tempScore;
             let moveI;
             let moveJ;
-            let score = -10;
+            let nextplay;
+            let score = 10;
+            for(let i = 0; i < 3; i++)
+            {
+            	for(let j = 0; j < 3; j++)
+            	{
+            		if(copyMatrix[i][j] === 0)
+            		{
+            			copyMatrix[i][j] = player;
+            			if(this.checkVictory(copyMatrix, player) === player)
+            			{
+            				this.posX = j;
+            				this.posY = i;
+            				return score;
+            			}
+            			copyMatrix[i][j] = 0;
+            		}
+            	}
+            }
             for(let i = 0; i < 3; i++)
             {
                 for(let j = 0; j < 3; j++)
                 {
-                    if(copyMatrix[i][j] == '0')
+                    if(copyMatrix[i][j] === 0)
                     {
                         copyMatrix[i][j] = player;
+                        nextplay = this.checkNextPlay(copyMatrix, player*(-1));
+                        if(nextplay[0] === true)//Checks if enemy player wins if I play on (i, j)
+                        {
+                        	this.posY = nextplay[1];
+                        	this.posX = nextplay[2];
+                        	return score;
+                        }
+
                         tempScore = this.minmax(copyMatrix, player*(-1), depth+1);
+                        //Pode checar a vitoria aqui viu paulo do futuro?
                         copyMatrix[i][j] = 0;
-                        if(tempScore > score)
+                        if(tempScore < score)
                         {
                             score = tempScore;
+                            this.posY = i;
+                            this.posX = j;
+                        }
+                    }
+                
+                }       
+            }
+            return score;
+        }
+        else if(player == -1)
+        {
+            let tempScore;
+            let nextplay;
+            let moveI;
+            let moveJ;
+            let score = 10;
+            for(let i = 0; i < 3; i++)
+            {
+            	for(let j = 0; j < 3; j++)
+            	{
+            		if(copyMatrix[i][j] === 0)
+            		{
+            			copyMatrix[i][j] = player;
+            			if(this.checkVictory(copyMatrix, player) === player)
+            			{
+            				this.posX = j;
+            				this.posY = i;
+            				return score;
+            			}
+            			copyMatrix[i][j] = 0;
+            		}
+            	}
+            }
+            for(let i = 0; i < 3; i++)
+            {
+                for(let j = 0; j < 3; j++)
+                {
+                    if(copyMatrix[i][j] === 0)
+                    {
+                        copyMatrix[i][j] = player;
+                        nextplay = this.checkNextPlay(copyMatrix, player*(-1));
+                        if(nextplay[0] === true)//Checks if enemy player wins if I play on (i, j)
+                        {
+                        	this.posY = nextplay[1];
+                        	this.posX = nextplay[2];
+                        	return score;
+                        }
+                        else if(this.turn == 3 && ((this.matrix[0][0] === player*(-1) && this.matrix[2][2]==player*(-1)) ||(this.matrix[2][0] === player*(-1) && this.matrix[0][2]==player*(-1))))
+                        {
+                        	this.posX = 1;
+                        	this.posY = 0;
+                        	return score;
+                        }
+                        else if(this.turn === 3)
+                        {
+                        	if(this.matrix[0][1] === -player && (this.matrix[2][0] === -player || this.matrix[2][2] === -player))
+                        	{
+                        		this.posX = 0;
+                        		this.posY = 0;
+                        		return score;
+                        	}
+                        	else if(this.matrix[2][1] === -player && (this.matrix[0][0] === -player || this.matrix[0][2] === -player))
+                        	{
+                        		this.posX = 2;
+                        		this.posY = 2;
+                        		return score;
+                        	}
+                        	else if(this.matrix[1][0] === -player && (this.matrix[0][2] === -player || this.matrix[2][2] === -player))
+                        	{
+                        		this.posX = 1;
+                        		this.posY = 0;
+                        		return score;
+                        	}
+                        	else if(this.matrix[1][2] === -player && (this.matrix[0][0] === -player || this.matrix[2][0] === -player))
+                        	{
+                        		this.posX = 2;
+                        		this.posY = 0;
+                        		return score;
+                        	}
+                        }
+                        tempScore = this.minmax(copyMatrix, player*(-1), depth+1);
+                        copyMatrix[i][j] = 0;
+                        if(tempScore < score)
+                        {
+                            score = tempScore;
+                            this.posY = i;
+                            this.posX = j;
                             moveI = i;
                             moveJ = j;
                         }
                     }
                 }       
             }
-            this.posX = moveJ;
-            this.posY = moveI;      
             return score;
         }
         
     }
+    minmax_Easy(copyMatrix, player, depth)//Mesma coisa que o minmax, mudando apenas que foram retirados as regras para deixar mais fácil para o jogador humano
+    {
+    	if(depth===1)
+        {
+            let chance = this.chanceOfWinning(copyMatrix, player);
+            return chance;
+        }
+        else if(player == 1)
+        {
+            let tempScore;
+            let moveI;
+            let moveJ;
+            let nextplay;
+            let score = 10;
+            for(let i = 0; i < 3; i++)
+            {
+                for(let j = 0; j < 3; j++)
+                {
+                    if(copyMatrix[i][j] === 0)
+                    {
+                        copyMatrix[i][j] = player;
+                        tempScore = this.minmax(copyMatrix, player*(-1), depth+1);
+                        copyMatrix[i][j] = 0;
+                        if(tempScore < score)
+                        {
+                            score = tempScore;
+                            this.posY = i;
+                            this.posX = j;
+                        }
+                    }
+                
+                }       
+            }
+            return score;
+        }
+        else if(player == -1)
+        {
+            let tempScore;
+            let nextplay;
+            let moveI;
+            let moveJ;
+            let score = 10;
+            for(let i = 0; i < 3; i++)
+            {
+            	for(let j = 0; j < 3; j++)
+            	{
+            		if(copyMatrix[i][j] === 0)
+            		{
+            			copyMatrix[i][j] = player;
+            			if(this.checkVictory(copyMatrix, player) === player)
+            			{
+            				this.posX = j;
+            				this.posY = i;
+            				return score;
+            			}
+            			copyMatrix[i][j] = 0;
+            		}
+            	}
+            }
+            for(let i = 0; i < 3; i++)
+            {
+                for(let j = 0; j < 3; j++)
+                {
+                    if(copyMatrix[i][j] === 0)
+                    {
+                        copyMatrix[i][j] = player;
+                        tempScore = this.minmax(copyMatrix, player*(-1), depth+1);
+                        copyMatrix[i][j] = 0;
+                        if(tempScore < score)
+                        {
+                            score = tempScore;
+                            this.posY = i;
+                            this.posX = j;
+                            moveI = i;
+                            moveJ = j;
+                        }
+                    }
+                }       
+            }
+            return score;
+        }
+    }
+    printMatrix(matrix)
+    {
+    	console.log(matrix[0][0] + " " + matrix[0][1] + " " +matrix[0][2] + " ");
+    	console.log(matrix[1][0] + " " + matrix[1][1] + " " +matrix[1][2] + " ");
+    	console.log(matrix[2][0] + " " + matrix[2][1] + " " +matrix[2][2] + " ");
+    }
+    /*
+    Quando a IA está testando as possibilidades de jogada, ela verifica se há alguma posição que que o jogador seguinte
+    pode fazer que lhe dará a vitória, e caso haja, a posição que a IA vai jogar é justamente essa. Este método é feito
+    antes de se chamar o método minmax
+    	matrix: tabuleiro do jogo atual
+    	player: jogador atual
+    */
+    checkNextPlay(matrix, player)
+    {
+    	for(let i = 0; i < 3; i++)
+    	{
+    		for(let j = 0; j < 3; j++)
+    		{
+    			
+    			if((matrix[i][j] === 1) || (matrix[i][j] === -1)) continue;
+    			matrix[i][j] = player;
+    			if(this.checkVictory(matrix, player) === player)
+    			{
+    				matrix[i][j] = 0;
+    				return [true, i, j];
+    			}
+    			matrix[i][j] = 0;
+    		}
+    	}
+    	return [false, 0, 0];
+    }
+    /*
+    Método que calcula a heuristica que vai determinar a pontuação de uma dada jogada a ser minimizada
+    ou maximizada no minmax (no caso só irá minimizar pois a profundidade será 1)
+    	matrix: tabuleiro do jogo
+    	player: jogador que se quer calcular a chance de vitória
+    */
     chanceOfWinning(matrix, player)
     {
         let matrix1, matrix2;
@@ -290,7 +602,7 @@ class Game{
         {
             for(let j = 0; j < 3; j++)
             {
-                if(matrix[i][j] == '0')
+                if(matrix[i][j] === 0)
                 {
                     matrix1[i][j] = player;
                     matrix2[i][j] = player*(-1);
@@ -302,19 +614,9 @@ class Game{
                 }
             }       
         }
-        // console.log(matrix1[0][0] + " " +matrix1[0][1] + " " +matrix1[0][2]);
-        // console.log(matrix1[1][0] + " " +matrix1[1][1] + " " +matrix1[1][2]);
-        // console.log(matrix1[2][0] + " " +matrix1[2][1] + " " +matrix1[2][2]);
-        // console.log("\n");
-        // console.log(matrix2[0][0] + " " +matrix2[0][1] + " " +matrix2[0][2]);
-        // console.log(matrix2[1][0] + " " +matrix2[1][1] + " " +matrix2[1][2]);
-        // console.log(matrix2[2][0] + " " +matrix2[2][1] + " " +matrix2[2][2]);
-        
         let vector = [];
         let chance1 = 0;
         let chance2 = 0;
-        // let copyMatrix = matrix;
-
         vector = [matrix1[0][0], matrix1[0][1], matrix1[0][2]];
         chance1 += this.chanceOfWinningLine(vector, player);
 
@@ -341,9 +643,7 @@ class Game{
 
         //othe player
         // 
-        // 
-        // 
-        // console.log(chance1);
+
         vector = [matrix2[0][0], matrix2[0][1], matrix2[0][2]];
         chance2 += this.chanceOfWinningLine(vector, player*(-1));
 
@@ -367,12 +667,10 @@ class Game{
 
         vector = [matrix2[0][1], matrix2[1][1], matrix2[2][1]];
         chance2 += this.chanceOfWinningLine(vector, player*(-1));
-        // console.log(chance2);
-        // console.log(chance1 - chance2);
         return chance1 - chance2;
 
     }
-    chanceOfWinningLine(vector, player)
+    chanceOfWinningLine(vector, player)//Se há a chance de alinhamento numa dada linha, retorna 1
     {
         let sumChances = 0;
         for(let i = 0; i < 3; i++)
@@ -382,34 +680,6 @@ class Game{
         if(sumChances == player*(3))
             return 1;
         return 0;
-    }
-    maxBy(list)//ver depois como fazer essa função retornar o objeto com maior valor de M
-    {
-        let maxVal = list[0].cost;
-        let maxElement = list[0];s
-        for(let i = 1; i < list.length; i++)
-        {
-            if(list[i].cost > maxVal)
-            {
-                maxVal = list[i].cost;
-                maxElement = list[i];
-            }
-        }
-        return maxElement;
-    }
-    minBy(list)
-    {
-        let minVal = list[0].cost;
-        let minElement = list[0];
-        for(let i = 1; i < list.length; i++)
-        {
-            if(list[i].cost < minVal)
-            {
-                minVal = list[i].cost;
-                minElement = list[i];
-            }
-        }
-        return minElement;
     }
 
     
